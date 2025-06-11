@@ -1,0 +1,80 @@
+project_name: 3D_CLIP
+clip_embed_dim: 1280
+clip_embed_version: OpenCLIP
+model:
+  name: PointNet_spike
+  in_channel: 6
+  out_channel: ${clip_embed_dim}
+  embedding_channel: 1024
+  voxel_size: 0.02
+  use_dense: True
+  scaling: 1
+
+training:
+  use_openclip_optimizer_scheduler: False
+  lr: 2e-3
+  beta1: 0.9
+  beta2: 0.98
+  eps: 1.0e-8
+  wd: 1.0e-4
+  warmup: 5 
+  max_epoch: 250  
+  log_freq: 10
+  save_freq: 20
+  lambda_img_contras: 1
+  lambda_text_contras: 1
+  lambda_mse: 1
+  use_image_proj: True
+  use_text_proj: True
+  logit_scale_init: 14.28
+  use_mse: False #default: False
+  use_mask: False
+  mask_threshold: 0.1
+
+dataset:
+  name: Four
+  train_split: /9950backfile/openshape_data_trainbase/metadata/meta_data/split/train_all.json
+  train_partial: -1
+  num_points: 10000
+  num_workers: 6
+  train_batch_size: 128
+  use_knn_negative_sample: True
+  negative_sample_num: 1
+  knn_path: /9950backfile/openshape_data_trainbase/metadata/meta_data/point_feat_knn.npy
+  y_up: True
+  normalize: True
+  random_z_rotate: True
+  use_color: True
+  rgb_random_drop_prob: 0.5
+  augment: True
+  text_source: [text, caption, retrieval_text]
+  use_text_filtering: True
+  use_prompt_engineering: True
+  gpt4_filtering_path: /9950backfile/openshape_data_trainbase/metadata/meta_data/gpt4_filtering.json
+
+modelnet40:
+  test_split: /public/liguoqi/wupx/code/openshape_spconv/meta_data/modelnet40/test_split.json
+  test_pc: /public/liguoqi/wupx/code/openshape_spconv/meta_data/modelnet40/test_pc.npy
+  num_points: 10000
+  num_workers: 16
+  test_batch_size: 128
+  clip_feat_path: /public/liguoqi/wupx/code/openshape_spconv/meta_data/modelnet40/cat_name_pt_feat.npy
+  y_up: True
+
+objaverse_lvis:
+  split: /9950backfile/openshape_data_trainbase/metadata/meta_data/split/lvis.json
+  clip_feat_path: /9950backfile/openshape_data_trainbase/metadata/meta_data/lvis_cat_name_pt_feat.npy
+  num_points: 10000
+  num_workers: 4
+  batch_size: 256
+  y_up: True
+  normalize: True
+  use_color: True
+
+scanobjectnn:
+  data_path: /9950backfile/openshape_data_trainbase/metadata/meta_data/scanobjectnn/xyz_label.npy
+  num_points: 10000
+  num_workers: 0
+  test_batch_size: 256
+  clip_feat_path: /9950backfile/openshape_data_trainbase/metadata/meta_data/scanobjectnn/cat_name_pt_feat.npy
+  y_up: True
